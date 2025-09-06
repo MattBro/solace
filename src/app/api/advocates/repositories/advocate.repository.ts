@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
-import db from "@/db";
-import { advocates } from "@/db/schema";
+import db from "../../db/client";
+import { advocates } from "../../db/schema";
 import type { AdvocateDB, AdvocateSearchResult } from "../types/advocate.types";
 import { logger } from "../utils/logger";
 

@@ -1,6 +1,6 @@
 const config = {
   dialect: "postgresql",
-  schema: "./src/db/schema.ts",
+  schema: "./src/app/api/db/schema/advocates.ts",
   dbCredentials: {
     url: process.env.DATABASE_URL,
   },

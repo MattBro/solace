@@ -1,6 +1,13 @@
-import db from "..";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { advocates } from "../schema";
 import { faker } from '@faker-js/faker';
+import { sql } from "drizzle-orm";
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Load environment variables
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const specialties = [
   "Bipolar",
@@ -59,6 +66,13 @@ function generatePhoneNumber(): number {
 async function seedPerformanceData(recordCount: number = 100000) {
   console.log(`🚀 Starting performance seed with ${recordCount.toLocaleString()} records...`);
   
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set");
+  }
+  
+  const client = postgres(process.env.DATABASE_URL);
+  const db = drizzle(client);
+  
   const batchSize = 1000;
   const totalBatches = Math.ceil(recordCount / batchSize);
   
@@ -67,7 +81,7 @@ async function seedPerformanceData(recordCount: number = 100000) {
   try {
     // Clear existing data
     console.log('Clearing existing advocates...');
-    await db.delete(advocates);
+    await db.execute(sql`TRUNCATE TABLE advocates RESTART IDENTITY`);
     
     let totalInserted = 0;
     
@@ -101,11 +115,16 @@ async function seedPerformanceData(recordCount: number = 100000) {
     console.log(`✅ Successfully seeded ${totalInserted.toLocaleString()} advocate records`);
     
     // Verify count
-    const count = await db.select({ count: db.count() }).from(advocates);
-    console.log(`📊 Database now contains ${count[0].count.toLocaleString()} advocates`);
+    const result = await db.execute(sql`SELECT COUNT(*) as count FROM advocates`) as any[];
+    const count = result[0].count;
+    console.log(`📊 Database now contains ${(count as number).toLocaleString()} advocates`);
+    
+    // Close connection
+    await client.end();
     
   } catch (error) {
     console.error('❌ Error seeding performance data:', error);
+    await client.end();
     throw error;
   }
 }

@@ -1,4 +1,4 @@
-import db from "..";
+import db from "../client";
 import { advocates } from "../schema";
 
 const specialties = [

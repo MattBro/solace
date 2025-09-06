@@ -31,7 +31,6 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
   const [expandedSpecialties, setExpandedSpecialties] = useState<Set<string>>(new Set());
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -83,37 +82,22 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
           const MAX_DISPLAY = 2;
           
           if (specialties.length === 0) {
-            return <span style={{ color: '#6c757d', fontSize: '12px' }}>None</span>;
+            return <span className="text-gray-500 dark:text-gray-400 text-xs">None</span>;
           }
           
           const displaySpecialties = isExpanded ? specialties : specialties.slice(0, MAX_DISPLAY);
           const remaining = specialties.length - MAX_DISPLAY;
           
           return (
-            <div style={{ 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              gap: '4px',
-              alignItems: 'center',
-              maxWidth: '400px'
-            }}>
+            <div className="flex flex-wrap gap-1 items-center max-w-md">
               {displaySpecialties.map((specialty, index) => (
                 <span
                   key={`${info.row.id}-specialty-${index}`}
                   title={specialty}
-                  style={{
-                    display: 'inline-block',
-                    padding: '3px 10px',
-                    backgroundColor: '#e7f1ff',
-                    border: '1px solid #b3d7ff',
-                    borderRadius: '14px',
-                    fontSize: '12px',
-                    color: '#0056b3',
-                    whiteSpace: 'nowrap',
-                    maxWidth: isExpanded ? 'none' : '150px',
-                    overflow: isExpanded ? 'visible' : 'hidden',
-                    textOverflow: isExpanded ? 'clip' : 'ellipsis'
-                  }}
+                  className={`inline-block px-2.5 py-1 bg-blue-50 dark:bg-blue-900/50 
+                    text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700
+                    rounded-full text-xs font-medium whitespace-nowrap
+                    ${!isExpanded ? 'max-w-[150px] truncate' : ''}`}
                 >
                   {specialty}
                 </span>
@@ -128,26 +112,9 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
                       return next;
                     });
                   }}
-                  style={{
-                    display: 'inline-block',
-                    padding: '3px 10px',
-                    backgroundColor: '#f8f9fa',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '14px',
-                    fontSize: '11px',
-                    color: '#6c757d',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#e9ecef';
-                    e.currentTarget.style.borderColor = '#adb5bd';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f8f9fa';
-                    e.currentTarget.style.borderColor = '#dee2e6';
-                  }}
+                  className="inline-block px-2.5 py-1 bg-blue-500 hover:bg-blue-600
+                    text-white rounded-full text-xs font-medium cursor-pointer 
+                    transition-colors shadow-sm hover:shadow"
                 >
                   +{remaining} more
                 </button>
@@ -162,26 +129,9 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
                       return next;
                     });
                   }}
-                  style={{
-                    display: 'inline-block',
-                    padding: '3px 10px',
-                    backgroundColor: '#f8f9fa',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '14px',
-                    fontSize: '11px',
-                    color: '#6c757d',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#e9ecef';
-                    e.currentTarget.style.borderColor = '#adb5bd';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f8f9fa';
-                    e.currentTarget.style.borderColor = '#dee2e6';
-                  }}
+                  className="inline-block px-2.5 py-1 bg-blue-500 hover:bg-blue-600
+                    text-white rounded-full text-xs font-medium cursor-pointer 
+                    transition-colors shadow-sm hover:shadow"
                 >
                   Show less
                 </button>
@@ -233,43 +183,22 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
   });
 
   if (loading) {
-    return <p>Loading advocates...</p>;
+    return <p className="text-gray-500 dark:text-gray-400 p-5 text-center">Loading advocates...</p>;
   }
 
   if (data.length === 0) {
-    return <p>No advocates found. Try a different search term.</p>;
+    return <p className="text-gray-500 dark:text-gray-400 p-5 text-center">No advocates found. Try a different search term.</p>;
   }
 
   return (
-    <div className="table-container" style={{ marginTop: '20px' }}>
-      <div className="table-controls" ref={menuRef} style={{ 
-        marginBottom: '16px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'relative'
-      }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
+    <div className="mt-5">
+      <div className="mb-4 flex justify-between items-center relative" ref={menuRef}>
+        <div className="flex gap-2">
           {columnFilters.length > 0 && (
             <button
               onClick={() => setColumnFilters([])}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'opacity 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = '0.9';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = '1';
-              }}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg 
+                text-sm font-medium transition-colors shadow-sm hover:shadow transition-shadow"
             >
               Clear Filters ({columnFilters.length})
             </button>
@@ -277,98 +206,42 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
         </div>
         <button
           onClick={() => setShowColumnMenu(!showColumnMenu)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '8px 16px',
-            backgroundColor: 'white',
-            border: '1px solid #dee2e6',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            transition: 'all 0.2s',
-            color: '#495057'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#f8f9fa';
-            e.currentTarget.style.borderColor = '#adb5bd';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'white';
-            e.currentTarget.style.borderColor = '#dee2e6';
-          }}
+          className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600
+            text-white rounded-lg cursor-pointer text-sm 
+            font-medium transition-colors shadow-sm hover:shadow"
         >
           <span>⚙</span>
           Columns
-          <span style={{ fontSize: '12px' }}>{showColumnMenu ? '▲' : '▼'}</span>
+          <span className="text-xs">{showColumnMenu ? '▲' : '▼'}</span>
         </button>
         
         {showColumnMenu && (
-          <div style={{
-            position: 'absolute',
-            top: '100%',
-            right: 0,
-            marginTop: '4px',
-            backgroundColor: 'white',
-            border: '1px solid #dee2e6',
-            borderRadius: '4px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            zIndex: 1000,
-            minWidth: '200px'
-          }}>
-            <div style={{
-              padding: '8px',
-              borderBottom: '1px solid #dee2e6'
-            }}>
-              <label style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                fontWeight: '500',
-                fontSize: '14px'
-              }}>
+          <div className="absolute top-full right-0 mt-1 bg-white dark:bg-gray-800 
+            border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[200px]">
+            <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+              <label className="flex items-center gap-2 cursor-pointer p-1.5 rounded 
+                hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium">
                 <input
                   type="checkbox"
                   checked={table.getIsAllColumnsVisible()}
                   onChange={table.getToggleAllColumnsVisibilityHandler()}
-                  style={{ cursor: 'pointer' }}
+                  className="cursor-pointer"
                 />
                 Show All
               </label>
             </div>
-            <div style={{
-              maxHeight: '300px',
-              overflowY: 'auto',
-              padding: '8px'
-            }}>
+            <div className="max-h-[300px] overflow-y-auto p-2">
               {table.getAllLeafColumns().map(column => (
                 <label
                   key={column.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    cursor: 'pointer',
-                    padding: '6px 8px',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f8f9fa';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
+                  className="flex items-center gap-2 cursor-pointer p-1.5 rounded 
+                    hover:bg-gray-100 dark:hover:bg-gray-700 text-sm transition-colors"
                 >
                   <input
                     type="checkbox"
                     checked={column.getIsVisible()}
                     onChange={column.getToggleVisibilityHandler()}
-                    style={{ cursor: 'pointer' }}
+                    className="cursor-pointer"
                   />
                   <span>{column.id}</span>
                 </label>
@@ -378,53 +251,28 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
         )}
       </div>
 
-      <div style={{ 
-        overflowX: 'auto',
-        border: '1px solid #e0e0e0',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
-        <table style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          fontSize: '14px'
-        }}>
-          <thead style={{ backgroundColor: '#f8f9fa' }}>
+      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow">
+        <table className="w-full border-collapse text-sm">
+          <thead className="bg-gray-50 dark:bg-gray-800">
             {table.getHeaderGroups().map(headerGroup => (
               <React.Fragment key={headerGroup.id}>
                 <tr>
                   {headerGroup.headers.map(header => (
                     <th 
                       key={header.id}
-                      style={{ 
-                        padding: '12px',
-                        textAlign: 'left',
-                        borderBottom: '1px solid #dee2e6',
-                        fontWeight: '600',
-                        color: '#495057',
-                        cursor: header.column.getCanSort() ? 'pointer' : 'default',
-                        userSelect: 'none',
-                        whiteSpace: 'nowrap',
-                        transition: 'background-color 0.2s'
-                      }}
+                      className={`p-3 text-left border-b border-gray-200 dark:border-gray-700 
+                        font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap
+                        ${header.column.getCanSort() ? 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-gray-700' : ''}`}
                       onClick={header.column.getToggleSortingHandler()}
-                      onMouseEnter={(e) => {
-                        if (header.column.getCanSort()) {
-                          e.currentTarget.style.backgroundColor = '#e9ecef';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
                     >
                       {header.isPlaceholder ? null : (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <div className="flex items-center gap-1">
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
                           )}
                           {header.column.getCanSort() && (
-                            <span style={{ color: '#6c757d' }}>
+                            <span className="text-gray-500 dark:text-gray-400">
                               {header.column.getIsSorted() === 'asc' ? ' ↑' : 
                                header.column.getIsSorted() === 'desc' ? ' ↓' : ' ↕'}
                             </span>
@@ -438,10 +286,7 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
                   {headerGroup.headers.map(header => (
                     <th
                       key={`${header.id}-filter`}
-                      style={{
-                        padding: '4px 12px 8px',
-                        borderBottom: '2px solid #dee2e6',
-                      }}
+                      className="px-3 pt-1 pb-2 border-b-2 border-gray-200 dark:border-gray-700"
                     >
                       {header.column.getCanFilter() ? (
                         <input
@@ -449,14 +294,10 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
                           value={(header.column.getFilterValue() ?? '') as string}
                           onChange={e => header.column.setFilterValue(e.target.value)}
                           placeholder={`Filter ${header.column.id}...`}
-                          style={{
-                            width: '100%',
-                            padding: '4px 8px',
-                            fontSize: '13px',
-                            border: '1px solid #ced4da',
-                            borderRadius: '3px',
-                            backgroundColor: 'white',
-                          }}
+                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 
+                            rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                            placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none 
+                            focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                           onClick={e => e.stopPropagation()}
                         />
                       ) : null}
@@ -470,24 +311,12 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
             {table.getRowModel().rows.map((row, index) => (
               <tr 
                 key={row.id}
-                style={{
-                  backgroundColor: index % 2 === 0 ? 'white' : '#f8f9fa',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#e7f1ff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'white' : '#f8f9fa';
-                }}
+                className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} 
+                  hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
               >
                 {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} style={{
-                    padding: '12px',
-                    borderBottom: '1px solid #dee2e6',
-                    color: '#212529',
-                    verticalAlign: 'top'
-                  }}>
+                  <td key={cell.id} className="p-3 border-b border-gray-200 dark:border-gray-700 
+                    text-gray-900 dark:text-gray-100 align-top">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

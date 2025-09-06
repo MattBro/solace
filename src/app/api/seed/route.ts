@@ -1,6 +1,6 @@
-import db from "../../../db";
-import { advocates } from "../../../db/schema";
-import { advocateData } from "../../../db/seed/advocates";
+import db from "../db/client";
+import { advocates } from "../db/schema";
+import { advocateData } from "../db/seed/advocates";
 
 export async function POST() {
   if (!process.env.DATABASE_URL) {
