@@ -6,6 +6,7 @@
 - Started Nest again at 5:50
 - Pushed at 6:30
 - Nest.js migration completed and PR created
+- Fixed missing migrations/seeds at 6:38
 
 ### ✅ All Setup Tasks Completed
 
@@ -174,6 +175,7 @@
   - Set up proper CORS configuration for frontend-backend separation
   - Created VS Code tasks and debugging configurations
   - Removed old Next.js API routes and updated frontend integration
+  - Restored database migrations and seed files with corrected import paths
 - ✅ **Architecture Benefits**:
   - Better separation of concerns with modular Nest.js architecture
   - Independent backend deployment capability
@@ -229,4 +231,11 @@ npm run build:backend
 
 # Debug both frontend and backend simultaneously
 # Use VS Code "Debug Both Services" task (Ctrl+Shift+P -> Tasks: Run Task)
+
+# Seed backend database (from backend directory)
+cd backend && npm run seed
+
+# Test backend API directly
+curl http://localhost:4000/api/advocates
+curl http://localhost:4000/api/advocates?search=anxiety
 ```
