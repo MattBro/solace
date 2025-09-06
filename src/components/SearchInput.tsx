@@ -38,21 +38,8 @@ export function SearchInput({
       </label>
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <input
-            id="search-input"
-            type="text"
-            className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 
-              rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none 
-              focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 
-              focus:ring-blue-100 dark:focus:ring-blue-900 transition-all text-base"
-            onChange={handleChange}
-            value={value}
-            placeholder={placeholder}
-            aria-label="Search advocates"
-          />
           <svg 
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none z-10"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -63,6 +50,21 @@ export function SearchInput({
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
+          <input
+            id="search-input"
+            type="text"
+            className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 
+              rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none 
+              focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 
+              focus:ring-blue-100 dark:focus:ring-blue-900 transition-all text-base
+              placeholder:pl-2"
+            style={{ textIndent: '28px' }}
+            onChange={handleChange}
+            value={value}
+            placeholder={placeholder}
+            aria-label="Search advocates"
+          />
         </div>
         <button 
           onClick={handleReset} 
