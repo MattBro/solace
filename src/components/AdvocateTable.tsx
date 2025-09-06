@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
   createColumnHelper,
   flexRender,
@@ -27,6 +27,25 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState('');
+  const [showColumnMenu, setShowColumnMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowColumnMenu(false);
+      }
+    };
+
+    if (showColumnMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showColumnMenu]);
 
   const columns = useMemo(
     () => [
@@ -34,21 +53,25 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
         header: 'First Name',
         cell: info => info.getValue(),
         enableSorting: true,
+        filterFn: 'includesString',
       }),
       columnHelper.accessor('lastName', {
         header: 'Last Name',
         cell: info => info.getValue(),
         enableSorting: true,
+        filterFn: 'includesString',
       }),
       columnHelper.accessor('city', {
         header: 'City',
         cell: info => info.getValue(),
         enableSorting: true,
+        filterFn: 'includesString',
       }),
       columnHelper.accessor('degree', {
         header: 'Degree',
         cell: info => info.getValue(),
         enableSorting: true,
+        filterFn: 'includesString',
       }),
       columnHelper.accessor('specialties', {
         header: 'Specialties',
@@ -107,45 +130,113 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
 
   return (
     <div className="table-container" style={{ marginTop: '20px' }}>
-      <div className="column-visibility-controls" style={{ marginBottom: '16px' }}>
-        <details>
-          <summary style={{ 
-            cursor: 'pointer', 
-            marginBottom: '8px',
-            padding: '8px',
-            backgroundColor: '#f5f5f5',
+      <div className="table-controls" ref={menuRef} style={{ 
+        marginBottom: '16px',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        position: 'relative'
+      }}>
+        <button
+          onClick={() => setShowColumnMenu(!showColumnMenu)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 16px',
+            backgroundColor: 'white',
+            border: '1px solid #dee2e6',
             borderRadius: '4px',
-            fontWeight: 'bold'
-          }}>
-            Column Visibility
-          </summary>
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            gap: '12px', 
-            padding: '12px',
-            backgroundColor: '#fafafa',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '500',
+            transition: 'all 0.2s',
+            color: '#495057'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#f8f9fa';
+            e.currentTarget.style.borderColor = '#adb5bd';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.borderColor = '#dee2e6';
+          }}
+        >
+          <span>⚙</span>
+          Columns
+          <span style={{ fontSize: '12px' }}>{showColumnMenu ? '▲' : '▼'}</span>
+        </button>
+        
+        {showColumnMenu && (
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            right: 0,
+            marginTop: '4px',
+            backgroundColor: 'white',
+            border: '1px solid #dee2e6',
             borderRadius: '4px',
-            marginTop: '8px'
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            zIndex: 1000,
+            minWidth: '200px'
           }}>
-            {table.getAllLeafColumns().map(column => (
-              <label key={column.id} style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '6px',
-                cursor: 'pointer'
+            <div style={{
+              padding: '8px',
+              borderBottom: '1px solid #dee2e6'
+            }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                fontSize: '14px'
               }}>
                 <input
                   type="checkbox"
-                  checked={column.getIsVisible()}
-                  onChange={column.getToggleVisibilityHandler()}
+                  checked={table.getIsAllColumnsVisible()}
+                  onChange={table.getToggleAllColumnsVisibilityHandler()}
                   style={{ cursor: 'pointer' }}
                 />
-                <span style={{ fontSize: '14px' }}>{column.id}</span>
+                Show All
               </label>
-            ))}
+            </div>
+            <div style={{
+              maxHeight: '300px',
+              overflowY: 'auto',
+              padding: '8px'
+            }}>
+              {table.getAllLeafColumns().map(column => (
+                <label
+                  key={column.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    padding: '6px 8px',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8f9fa';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={column.getIsVisible()}
+                    onChange={column.getToggleVisibilityHandler()}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <span>{column.id}</span>
+                </label>
+              ))}
+            </div>
           </div>
-        </details>
+        )}
       </div>
 
       <div style={{ 
@@ -174,10 +265,7 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
                       cursor: header.column.getCanSort() ? 'pointer' : 'default',
                       userSelect: 'none',
                       whiteSpace: 'nowrap',
-                      transition: 'background-color 0.2s',
-                      ':hover': {
-                        backgroundColor: header.column.getCanSort() ? '#e9ecef' : 'transparent'
-                      }
+                      transition: 'background-color 0.2s'
                     }}
                     onClick={header.column.getToggleSortingHandler()}
                     onMouseEnter={(e) => {

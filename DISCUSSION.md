@@ -1,5 +1,8 @@
 ## Project Setup & Completed Work
 
+### Time Tracking
+- Started at 2:45
+
 ### ✅ All Setup Tasks Completed
 
 1. **Install app** - Dependencies installed and upgraded
@@ -39,12 +42,15 @@
 - ✅ Fixed infinite re-render loop in useEffect
 - ✅ Removed unnecessary console.log statements
 - ✅ Fixed data structure mismatches between API and frontend
+- ✅ Refactored API to enterprise-grade architecture with proper separation of concerns
+- ✅ Fixed field transformation issues (snake_case to camelCase conversion)
+- ✅ Implemented comprehensive error handling with custom error classes
+- ✅ Added proper TypeScript types and interfaces throughout
 
 **Next to fix:**
 - Implement proper error boundaries for graceful error handling
-- Add comprehensive error handling for API calls
 - Implement proper logging service
-- Add input validation and sanitization
+- Add input validation and sanitization on frontend
 
 ### Task 2: Improve Design UI/UX
 **Completed:**
@@ -52,6 +58,7 @@
   - Case-insensitive search working
   - Relevance ranking (names ranked higher)
   - Handles partial matches and word stems
+  - Search works across all fields including specialties
 - ✅ **Loading States**: Added loading indicators during search
 - ✅ **Search Experience**: Added "no results" message
 - ✅ **Component Architecture Refactor**: [Refactor details](./todos/UI-UX/refactor-homepage.md)
@@ -83,6 +90,10 @@
 - ✅ **Frontend Optimization**:
   - Implemented debounced search (300ms delay)
   - Only fetches data when needed
+- ✅ **API Architecture**: 
+  - Refactored to enterprise-grade layered architecture
+  - Self-contained API structure for better maintainability
+  - Efficient data transformation and caching strategies
 
 **Planned optimizations:**
 - Implement virtual scrolling for large lists

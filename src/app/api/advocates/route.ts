@@ -1,63 +1,56 @@
-import db from "../../../db";
-import { advocates } from "../../../db/schema";
-import { sql } from "drizzle-orm";
+import { advocateService } from "./services/advocate.service";
+import { handleApiError, ValidationError } from "./utils/api-error";
+import type { SearchAdvocatesRequest } from "./types/advocate.types";
 
+/**
+ * GET /api/advocates
+ * 
+ * Search and retrieve advocates with pagination
+ * 
+ * Query Parameters:
+ * - search: Search term for full-text search
+ * - page: Page number (default: 1)
+ * - limit: Results per page (default: 50, max: 100)
+ * - sortBy: Sort field (relevance|name|experience|city)
+ * - sortOrder: Sort order (asc|desc)
+ * 
+ * @returns {SearchAdvocatesResponse} Paginated list of advocates
+ */
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const search = searchParams.get('search') || '';
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '50');
-  const offset = (page - 1) * limit;
+  try {
+    // Parse query parameters
+    const { searchParams } = new URL(request.url);
+    
+    // Validate and transform parameters
+    const searchRequest: SearchAdvocatesRequest = {
+      search: searchParams.get('search') || undefined,
+      page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : undefined,
+      limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined,
+      sortBy: searchParams.get('sortBy') as any || undefined,
+      sortOrder: searchParams.get('sortOrder') as any || undefined
+    };
 
-  let data;
-  let totalCount;
-
-  if (search) {
-    // Use full-text search with relevance ranking
-    const searchResults = await db.execute(sql`
-      SELECT *, 
-        ts_rank(search_vector, plainto_tsquery('english', ${search})) as rank
-      FROM advocates
-      WHERE search_vector @@ plainto_tsquery('english', ${search})
-      ORDER BY rank DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `);
-    
-    // The result is an array-like object, not {rows: ...}
-    data = Array.from(searchResults);
-    
-    // Get total count for pagination
-    const countResult = await db.execute(sql`
-      SELECT COUNT(*) as count
-      FROM advocates
-      WHERE search_vector @@ plainto_tsquery('english', ${search})
-    `);
-    
-    totalCount = countResult && countResult.length > 0 
-      ? parseInt(countResult[0].count as string) 
-      : 0;
-  } else {
-    // No search term - return paginated results
-    data = await db.select().from(advocates).limit(limit).offset(offset);
-    
-    const countResult = await db.execute(sql`
-      SELECT COUNT(*) as count FROM advocates
-    `);
-    
-    totalCount = countResult && countResult.length > 0 
-      ? parseInt(countResult[0].count as string)
-      : 0;
-  }
-
-  const totalPages = Math.ceil(totalCount / limit);
-
-  return Response.json({ 
-    data: data || [],
-    pagination: {
-      page,
-      limit,
-      totalCount,
-      totalPages
+    // Validate numeric parameters
+    if (searchRequest.page !== undefined && (isNaN(searchRequest.page) || searchRequest.page < 1)) {
+      throw new ValidationError('Invalid page parameter');
     }
-  });
+    
+    if (searchRequest.limit !== undefined && (isNaN(searchRequest.limit) || searchRequest.limit < 1)) {
+      throw new ValidationError('Invalid limit parameter');
+    }
+
+    // Call service layer
+    const response = await advocateService.searchAdvocates(searchRequest);
+
+    // Return successful response
+    return Response.json(response, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, max-age=60', // Cache for 1 minute
+      }
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
+
