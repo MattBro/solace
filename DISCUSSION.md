@@ -54,13 +54,24 @@
   - Handles partial matches and word stems
 - ✅ **Loading States**: Added loading indicators during search
 - ✅ **Search Experience**: Added "no results" message
+- ✅ **Component Architecture Refactor**: [Refactor details](./todos/UI-UX/refactor-homepage.md)
+  - Extracted business logic into custom `useAdvocates` hook
+  - Created reusable SearchInput component with debouncing
+  - Implemented AdvocateTable with TanStack Table for advanced features:
+    - Column sorting with visual indicators
+    - Column visibility toggle controls
+    - Improved table styling with hover effects and striped rows
+  - Built PaginationControls with page numbers and limit selector
+  - Added proper TypeScript types for Advocate and Pagination
+  - Reduced homepage complexity from 180+ lines to 61 lines
+  - Improved accessibility with ARIA labels and keyboard navigation
 
 **Planned improvements:**
 - **Mobile Responsiveness**: Current table doesn't work well on mobile devices
 - **Advanced Search**: Add filters for specialties, location, years of experience
 - **Visual Hierarchy**: Improve spacing, typography, and color scheme for better readability
-- **Interactive Elements**: Add sorting on columns, clickable advocate profiles
-- **Accessibility**: Ensure WCAG 2.1 AA compliance, add ARIA labels
+- **Interactive Elements**: Add clickable advocate profiles for detailed view
+- **Accessibility**: Ensure full WCAG 2.1 AA compliance
 - **Patient-Focused Features**: Add "book appointment" buttons, availability indicators
 
 ### Task 3: Performance Improvements
