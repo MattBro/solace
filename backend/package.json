@@ -19,7 +19,11 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migrate:generate": "drizzle-kit generate",
-    "migrate:up": "tsx src/database/migrations/migrate.ts"
+    "migrate:up": "tsx src/database/migrations/migrate.js",
+    "db:setup": "tsx src/database/migrations/migrate.js && tsx src/database/seeds/advocates.ts",
+    "seed": "tsx src/database/seeds/advocates.ts",
+    "seed:performance": "tsx src/database/seeds/performance-seed.ts",
+    "db:fresh": "npm run migrate:up && npm run seed"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

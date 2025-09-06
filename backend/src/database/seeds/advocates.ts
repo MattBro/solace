@@ -1,7 +1,9 @@
+require('dotenv').config();
 import { advocates } from "../schemas";
 const postgres = require('postgres');
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://matthewbrooker@localhost:5432/solaceassignment';
+const connectionString = process.env.DATABASE_URL || 'postgresql://matthewbrooker@localhost:5432/solaceassignment_backend';
+console.log('Database URL:', connectionString);
 const db = postgres(connectionString);
 
 const specialties = [
@@ -177,5 +179,33 @@ const advocateData = [
     phoneNumber: 5559872345,
   },
 ];
+
+async function seedAdvocates() {
+  console.log('Starting to seed advocates...');
+  
+  try {
+    // Clear existing data
+    await db`DELETE FROM advocates`;
+    console.log('Cleared existing advocate data');
+    
+    // Insert new data
+    for (const advocate of advocateData) {
+      await db`
+        INSERT INTO advocates (first_name, last_name, city, degree, payload, years_of_experience, phone_number)
+        VALUES (${advocate.firstName}, ${advocate.lastName}, ${advocate.city}, ${advocate.degree}, ${JSON.stringify(advocate.specialties)}, ${advocate.yearsOfExperience}, ${advocate.phoneNumber.toString()})
+      `;
+    }
+    
+    console.log(`Successfully seeded ${advocateData.length} advocates`);
+    await db.end();
+  } catch (error) {
+    console.error('Error seeding advocates:', error);
+    await db.end();
+    process.exit(1);
+  }
+}
+
+// Run the seeding
+seedAdvocates();
 
 export { advocateData };
