@@ -23,11 +23,16 @@ export class AdvocateRepository {
         throw new Error('Database not properly initialized');
       }
 
+      // Add :* to the last word for prefix matching
+      const searchQuery = search.trim().split(' ').map((word, index, arr) => 
+        index === arr.length - 1 ? `${word}:*` : word
+      ).join(' & ');
+
       const searchResults = await (db as any).execute(sql`
         SELECT *, 
-          ts_rank(search_vector, plainto_tsquery('english', ${search})) as rank
+          ts_rank(search_vector, to_tsquery('english', ${searchQuery})) as rank
         FROM advocates
-        WHERE search_vector @@ plainto_tsquery('english', ${search})
+        WHERE search_vector @@ to_tsquery('english', ${searchQuery})
         ORDER BY rank DESC
         LIMIT ${limit} OFFSET ${offset}
       `) as AdvocateDB[];
@@ -35,7 +40,7 @@ export class AdvocateRepository {
       const countResult = await (db as any).execute(sql`
         SELECT COUNT(*) as count
         FROM advocates
-        WHERE search_vector @@ plainto_tsquery('english', ${search})
+        WHERE search_vector @@ to_tsquery('english', ${searchQuery})
       `) as { count: string }[];
 
       const totalCount = countResult && countResult.length > 0

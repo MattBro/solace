@@ -6,11 +6,8 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   useReactTable,
   SortingState,
-  ColumnFiltersState,
   VisibilityState,
 } from '@tanstack/react-table';
 import { Advocate } from '@/types/advocate';
@@ -24,9 +21,7 @@ const columnHelper = createColumnHelper<Advocate>();
 
 export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [globalFilter, setGlobalFilter] = useState('');
   const [showColumnMenu, setShowColumnMenu] = useState(false);
   const [expandedSpecialties, setExpandedSpecialties] = useState<Set<string>>(new Set());
   const menuRef = useRef<HTMLDivElement>(null);
@@ -53,25 +48,21 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
         header: 'First Name',
         cell: info => info.getValue(),
         enableSorting: true,
-        filterFn: 'includesString',
       }),
       columnHelper.accessor('lastName', {
         header: 'Last Name',
         cell: info => info.getValue(),
         enableSorting: true,
-        filterFn: 'includesString',
       }),
       columnHelper.accessor('city', {
         header: 'City',
         cell: info => info.getValue(),
         enableSorting: true,
-        filterFn: 'includesString',
       }),
       columnHelper.accessor('degree', {
         header: 'Degree',
         cell: info => info.getValue(),
         enableSorting: true,
-        filterFn: 'includesString',
       }),
       columnHelper.accessor('specialties', {
         header: 'Specialties',
@@ -140,24 +131,16 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
           );
         },
         enableSorting: false,
-        filterFn: (row, columnId, filterValue) => {
-          const specialties = row.getValue(columnId) as string[];
-          return specialties.some(specialty => 
-            specialty.toLowerCase().includes(filterValue.toLowerCase())
-          );
-        }
       }),
       columnHelper.accessor('yearsOfExperience', {
         header: 'Years of Experience',
         cell: info => info.getValue(),
         enableSorting: true,
-        filterFn: 'inNumberRange',
       }),
       columnHelper.accessor('phoneNumber', {
         header: 'Phone Number',
         cell: info => info.getValue(),
         enableSorting: false,
-        filterFn: 'includesString',
       }),
     ],
     [expandedSpecialties]
@@ -168,18 +151,12 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
     columns,
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
-      globalFilter,
     },
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   });
 
   if (loading) {
@@ -192,18 +169,7 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
 
   return (
     <div className="mt-5">
-      <div className="mb-4 flex justify-between items-center relative" ref={menuRef}>
-        <div className="flex gap-2">
-          {columnFilters.length > 0 && (
-            <button
-              onClick={() => setColumnFilters([])}
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg 
-                text-sm font-medium transition-colors shadow-sm hover:shadow transition-shadow"
-            >
-              Clear Filters ({columnFilters.length})
-            </button>
-          )}
-        </div>
+      <div className="mb-4 flex justify-end items-center relative" ref={menuRef}>
         <button
           onClick={() => setShowColumnMenu(!showColumnMenu)}
           className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600
@@ -279,28 +245,6 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
                           )}
                         </div>
                       )}
-                    </th>
-                  ))}
-                </tr>
-                <tr>
-                  {headerGroup.headers.map(header => (
-                    <th
-                      key={`${header.id}-filter`}
-                      className="px-3 pt-1 pb-2 border-b-2 border-gray-200 dark:border-gray-700"
-                    >
-                      {header.column.getCanFilter() ? (
-                        <input
-                          type="text"
-                          value={(header.column.getFilterValue() ?? '') as string}
-                          onChange={e => header.column.setFilterValue(e.target.value)}
-                          placeholder={`Filter ${header.column.id}...`}
-                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 
-                            rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                            placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none 
-                            focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                          onClick={e => e.stopPropagation()}
-                        />
-                      ) : null}
                     </th>
                   ))}
                 </tr>
