@@ -1,0 +1,7 @@
+- Install app
+- Clear warnings
+- Install DB
+- Clear warnings
+- Run the app
+- Clear all warnings/errors
+- 
