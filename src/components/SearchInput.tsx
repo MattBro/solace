@@ -37,7 +37,7 @@ export function SearchInput({
         <input
           id="search-input"
           type="text"
-          style={{ border: "1px solid black", padding: "4px" }}
+          className="search-input"
           onChange={handleChange}
           value={value}
           placeholder={placeholder}
@@ -45,7 +45,7 @@ export function SearchInput({
         />
         <button 
           onClick={handleReset} 
-          style={{ marginLeft: "8px" }}
+          className="secondary"
           disabled={!value && !loading}
           aria-label="Reset search"
         >

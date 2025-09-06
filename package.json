@@ -9,7 +9,8 @@
     "lint": "next lint",
     "generate": "drizzle-kit generate",
     "migrate:up": "node ./src/db/migrate.js",
-    "seed": "tsx ./src/db/seed/advocates.ts"
+    "seed": "tsx ./src/db/seed/advocates.ts",
+    "seed:performance": "tsx ./src/db/seed/performance-seed.ts"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",

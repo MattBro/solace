@@ -28,6 +28,7 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState('');
   const [showColumnMenu, setShowColumnMenu] = useState(false);
+  const [expandedSpecialties, setExpandedSpecialties] = useState<Set<string>>(new Set());
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
@@ -77,15 +78,124 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
         header: 'Specialties',
         cell: info => {
           const specialties = info.getValue();
+          const rowId = info.row.id;
+          const isExpanded = expandedSpecialties.has(rowId);
+          const MAX_DISPLAY = 2;
+          
+          if (specialties.length === 0) {
+            return <span style={{ color: '#6c757d', fontSize: '12px' }}>None</span>;
+          }
+          
+          const displaySpecialties = isExpanded ? specialties : specialties.slice(0, MAX_DISPLAY);
+          const remaining = specialties.length - MAX_DISPLAY;
+          
           return (
-            <div className="specialties-cell">
-              {specialties.map((specialty, index) => (
-                <div key={`${info.row.id}-specialty-${index}`}>{specialty}</div>
+            <div style={{ 
+              display: 'flex', 
+              flexWrap: 'wrap', 
+              gap: '4px',
+              alignItems: 'center',
+              maxWidth: '400px'
+            }}>
+              {displaySpecialties.map((specialty, index) => (
+                <span
+                  key={`${info.row.id}-specialty-${index}`}
+                  title={specialty}
+                  style={{
+                    display: 'inline-block',
+                    padding: '3px 10px',
+                    backgroundColor: '#e7f1ff',
+                    border: '1px solid #b3d7ff',
+                    borderRadius: '14px',
+                    fontSize: '12px',
+                    color: '#0056b3',
+                    whiteSpace: 'nowrap',
+                    maxWidth: isExpanded ? 'none' : '150px',
+                    overflow: isExpanded ? 'visible' : 'hidden',
+                    textOverflow: isExpanded ? 'clip' : 'ellipsis'
+                  }}
+                >
+                  {specialty}
+                </span>
               ))}
+              {remaining > 0 && !isExpanded && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedSpecialties(prev => {
+                      const next = new Set(prev);
+                      next.add(rowId);
+                      return next;
+                    });
+                  }}
+                  style={{
+                    display: 'inline-block',
+                    padding: '3px 10px',
+                    backgroundColor: '#f8f9fa',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '14px',
+                    fontSize: '11px',
+                    color: '#6c757d',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#e9ecef';
+                    e.currentTarget.style.borderColor = '#adb5bd';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8f9fa';
+                    e.currentTarget.style.borderColor = '#dee2e6';
+                  }}
+                >
+                  +{remaining} more
+                </button>
+              )}
+              {isExpanded && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedSpecialties(prev => {
+                      const next = new Set(prev);
+                      next.delete(rowId);
+                      return next;
+                    });
+                  }}
+                  style={{
+                    display: 'inline-block',
+                    padding: '3px 10px',
+                    backgroundColor: '#f8f9fa',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '14px',
+                    fontSize: '11px',
+                    color: '#6c757d',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#e9ecef';
+                    e.currentTarget.style.borderColor = '#adb5bd';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8f9fa';
+                    e.currentTarget.style.borderColor = '#dee2e6';
+                  }}
+                >
+                  Show less
+                </button>
+              )}
             </div>
           );
         },
         enableSorting: false,
+        filterFn: (row, columnId, filterValue) => {
+          const specialties = row.getValue(columnId) as string[];
+          return specialties.some(specialty => 
+            specialty.toLowerCase().includes(filterValue.toLowerCase())
+          );
+        }
       }),
       columnHelper.accessor('yearsOfExperience', {
         header: 'Years of Experience',
@@ -100,7 +210,7 @@ export function AdvocateTable({ data, loading = false }: AdvocateTableProps) {
         filterFn: 'includesString',
       }),
     ],
-    []
+    [expandedSpecialties]
   );
 
   const table = useReactTable({
