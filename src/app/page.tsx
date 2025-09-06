@@ -4,6 +4,7 @@ import { useAdvocates } from '@/hooks/useAdvocates';
 import { SearchInput } from '@/components/SearchInput';
 import { AdvocateTable } from '@/components/AdvocateTable';
 import { PaginationControls } from '@/components/PaginationControls';
+import { DarkModeToggle } from '@/components/DarkModeToggle';
 
 export default function Home() {
   const {
@@ -19,8 +20,11 @@ export default function Home() {
   } = useAdvocates(50);
 
   return (
-    <main style={{ margin: "24px" }}>
-      <h1>Solace Advocates</h1>
+    <main className="main-container">
+      <header className="header">
+        <h1>Solace Advocates</h1>
+        <DarkModeToggle />
+      </header>
       <br />
       <br />
       
