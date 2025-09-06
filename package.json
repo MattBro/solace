@@ -9,11 +9,11 @@
     "lint": "next lint",
     "generate": "drizzle-kit generate",
     "migrate:up": "node ./src/db/migrate.js",
-    "seed": "node --loader esbuild-register/loader -r esbuild-register ./src/db/seed/index.ts"
+    "seed": "tsx ./src/db/seed/advocates.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.32.1",
-    "next": "^14.2.19",
+    "next": "^15.1.0",
     "postgres": "^3.4.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -22,11 +22,12 @@
     "@types/node": "^20.14.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "drizzle-kit": "^0.23.0",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.5",
+    "drizzle-kit": "^0.31.4",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^15.1.0",
     "postcss": "^8.4.40",
     "tailwindcss": "^3.4.7",
+    "tsx": "^4.20.5",
     "typescript": "^5.5.4"
   }
 }
