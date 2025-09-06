@@ -2,6 +2,7 @@
 
 import { useAdvocates } from '@/hooks/useAdvocates';
 import { SearchInput } from '@/components/SearchInput';
+import { SpecialtyFilter } from '@/components/SpecialtyFilter';
 import { AdvocateTable } from '@/components/AdvocateTable';
 import { PaginationControls } from '@/components/PaginationControls';
 import { DarkModeToggle } from '@/components/DarkModeToggle';
@@ -12,8 +13,10 @@ export default function Home() {
     loading,
     error,
     searchTerm,
+    selectedSpecialties,
     pagination,
     setSearchTerm,
+    setSelectedSpecialties,
     handlePageChange,
     handleLimitChange,
     refresh,
@@ -54,7 +57,12 @@ export default function Home() {
         loading={loading}
       />
       
-      <div className="mt-4 mb-4">
+      <div className="mt-4 mb-4 flex justify-between items-center">
+        <SpecialtyFilter
+          selectedSpecialties={selectedSpecialties}
+          onChange={setSelectedSpecialties}
+          loading={loading}
+        />
         <p className="text-gray-600 dark:text-gray-400">
           Showing {advocates.length} of {pagination?.totalCount || 0} advocates
           {pagination && pagination.totalPages > 1 && ` (Page ${pagination.page} of ${pagination.totalPages})`}

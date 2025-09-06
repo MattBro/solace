@@ -24,6 +24,7 @@ export async function GET(request: Request) {
     // Validate and transform parameters
     const searchRequest: SearchAdvocatesRequest = {
       search: searchParams.get('search') || undefined,
+      specialties: searchParams.get('specialties')?.split(',').filter(s => s.trim()) || undefined,
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : undefined,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined,
       sortBy: searchParams.get('sortBy') as any || undefined,

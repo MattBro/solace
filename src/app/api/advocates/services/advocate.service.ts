@@ -20,14 +20,14 @@ export class AdvocateService {
     // Handle both direct DB results and raw SQL results
     return {
       id: dbAdvocate.id,
-      firstName: dbAdvocate.firstName || dbAdvocate.first_name,
-      lastName: dbAdvocate.lastName || dbAdvocate.last_name,
+      firstName: dbAdvocate.first_name,
+      lastName: dbAdvocate.last_name,
       city: dbAdvocate.city,
       degree: dbAdvocate.degree,
-      specialties: dbAdvocate.specialties || dbAdvocate.payload || [],
-      yearsOfExperience: dbAdvocate.yearsOfExperience || dbAdvocate.years_of_experience,
-      phoneNumber: dbAdvocate.phoneNumber || dbAdvocate.phone_number,
-      createdAt: dbAdvocate.createdAt || dbAdvocate.created_at
+      specialties: dbAdvocate.specialties || [],
+      yearsOfExperience: dbAdvocate.years_of_experience,
+      phoneNumber: dbAdvocate.phone_number,
+      createdAt: dbAdvocate.created_at
     };
   }
 
@@ -86,7 +86,18 @@ export class AdvocateService {
       let advocates: AdvocateDB[];
       let totalCount: number;
 
-      if (request.search && request.search.trim()) {
+      // Check if we need to filter by specialties
+      if (request.specialties && request.specialties.length > 0) {
+        // Get advocates with specific specialties
+        const result = await advocateRepository.getAdvocatesBySpecialties(
+          request.specialties,
+          request.search?.trim() || '',
+          limit,
+          offset
+        );
+        advocates = result.advocates;
+        totalCount = result.totalCount;
+      } else if (request.search && request.search.trim()) {
         // Use full-text search if search term provided
         const searchResult = await advocateRepository.searchAdvocates(
           request.search.trim(),
@@ -96,7 +107,7 @@ export class AdvocateService {
         advocates = searchResult.advocates;
         totalCount = searchResult.totalCount;
       } else {
-        // Return all advocates if no search term
+        // Return all advocates if no filters
         const allAdvocatesResult = await advocateRepository.getAllAdvocates(
           limit,
           offset

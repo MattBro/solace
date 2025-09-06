@@ -29,6 +29,7 @@ export interface AdvocateDB {
 // DTOs (Data Transfer Objects)
 export interface SearchAdvocatesRequest {
   search?: string;
+  specialties?: string[];
   page?: number;
   limit?: number;
   sortBy?: 'relevance' | 'name' | 'experience' | 'city';
