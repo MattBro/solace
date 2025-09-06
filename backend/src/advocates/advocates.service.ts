@@ -1,23 +1,23 @@
-import { advocateRepository } from "../repositories/advocate.repository";
+import { Injectable, Logger } from '@nestjs/common';
+import { AdvocateRepository } from './advocates.repository';
+import { SearchAdvocatesDto } from './dto/search-advocates.dto';
 import type {
   Advocate,
   AdvocateDB,
-  SearchAdvocatesRequest,
   SearchAdvocatesResponse,
   PaginationInfo
-} from "../types/advocate.types";
+} from './interfaces/advocate.interface';
 
-export class AdvocateService {
+@Injectable()
+export class AdvocatesService {
+  private readonly logger = new Logger(AdvocatesService.name);
   private readonly DEFAULT_PAGE = 1;
   private readonly DEFAULT_LIMIT = 50;
   private readonly MAX_LIMIT = 100;
 
-  /**
-   * Transform database advocate to API advocate
-   * Converts snake_case fields to camelCase
-   */
+  constructor(private advocateRepository: AdvocateRepository) {}
+
   private transformAdvocate(dbAdvocate: any): Advocate {
-    // Handle both direct DB results and raw SQL results
     return {
       id: dbAdvocate.id,
       firstName: dbAdvocate.first_name,
@@ -31,9 +31,6 @@ export class AdvocateService {
     };
   }
 
-  /**
-   * Calculate pagination information
-   */
   private calculatePagination(
     page: number,
     limit: number,
@@ -49,9 +46,6 @@ export class AdvocateService {
     };
   }
 
-  /**
-   * Validate and sanitize pagination parameters
-   */
   private validatePagination(page?: number, limit?: number): {
     page: number;
     limit: number;
@@ -71,11 +65,8 @@ export class AdvocateService {
     };
   }
 
-  /**
-   * Search advocates with optional filters and pagination
-   */
   async searchAdvocates(
-    request: SearchAdvocatesRequest
+    request: SearchAdvocatesDto
   ): Promise<SearchAdvocatesResponse> {
     try {
       const { page, limit, offset } = this.validatePagination(
@@ -86,10 +77,8 @@ export class AdvocateService {
       let advocates: AdvocateDB[];
       let totalCount: number;
 
-      // Check if we need to filter by specialties
       if (request.specialties && request.specialties.length > 0) {
-        // Get advocates with specific specialties
-        const result = await advocateRepository.getAdvocatesBySpecialties(
+        const result = await this.advocateRepository.getAdvocatesBySpecialties(
           request.specialties,
           request.search?.trim() || '',
           limit,
@@ -98,8 +87,7 @@ export class AdvocateService {
         advocates = result.advocates;
         totalCount = result.totalCount;
       } else if (request.search && request.search.trim()) {
-        // Use full-text search if search term provided
-        const searchResult = await advocateRepository.searchAdvocates(
+        const searchResult = await this.advocateRepository.searchAdvocates(
           request.search.trim(),
           limit,
           offset
@@ -107,8 +95,7 @@ export class AdvocateService {
         advocates = searchResult.advocates;
         totalCount = searchResult.totalCount;
       } else {
-        // Return all advocates if no filters
-        const allAdvocatesResult = await advocateRepository.getAllAdvocates(
+        const allAdvocatesResult = await this.advocateRepository.getAllAdvocates(
           limit,
           offset
         );
@@ -116,12 +103,10 @@ export class AdvocateService {
         totalCount = allAdvocatesResult.totalCount;
       }
 
-      // Transform database models to API models
       const transformedAdvocates = advocates.map(advocate =>
         this.transformAdvocate(advocate)
       );
 
-      // Apply additional sorting if requested
       if (request.sortBy && request.sortBy !== 'relevance') {
         transformedAdvocates.sort((a, b) => {
           const order = request.sortOrder === 'desc' ? -1 : 1;
@@ -144,17 +129,14 @@ export class AdvocateService {
         pagination: this.calculatePagination(page, limit, totalCount)
       };
     } catch (error) {
-      console.error('Error in advocate service:', error);
+      this.logger.error('Error in advocate service:', error);
       throw new Error('Failed to search advocates');
     }
   }
 
-  /**
-   * Get a single advocate by ID
-   */
   async getAdvocateById(id: number): Promise<Advocate | null> {
     try {
-      const advocate = await advocateRepository.getAdvocateById(id);
+      const advocate = await this.advocateRepository.getAdvocateById(id);
       
       if (!advocate) {
         return null;
@@ -162,14 +144,11 @@ export class AdvocateService {
 
       return this.transformAdvocate(advocate);
     } catch (error) {
-      console.error('Error fetching advocate:', error);
+      this.logger.error('Error fetching advocate:', error);
       throw new Error('Failed to fetch advocate');
     }
   }
 
-  /**
-   * Get advocates by specialty
-   */
   async getAdvocatesBySpecialty(
     specialty: string,
     page?: number,
@@ -178,7 +157,7 @@ export class AdvocateService {
     try {
       const { page: validPage, limit: validLimit, offset } = this.validatePagination(page, limit);
 
-      const result = await advocateRepository.getAdvocatesBySpecialty(
+      const result = await this.advocateRepository.getAdvocatesBySpecialty(
         specialty,
         validLimit,
         offset
@@ -193,24 +172,8 @@ export class AdvocateService {
         pagination: this.calculatePagination(validPage, validLimit, result.totalCount)
       };
     } catch (error) {
-      console.error('Error fetching advocates by specialty:', error);
+      this.logger.error('Error fetching advocates by specialty:', error);
       throw new Error('Failed to fetch advocates by specialty');
     }
   }
-
-  /**
-   * Validate search parameters
-   */
-  validateSearchParams(params: any): SearchAdvocatesRequest {
-    return {
-      search: params.search || '',
-      page: parseInt(params.page) || this.DEFAULT_PAGE,
-      limit: parseInt(params.limit) || this.DEFAULT_LIMIT,
-      sortBy: params.sortBy || 'relevance',
-      sortOrder: params.sortOrder || 'desc'
-    };
-  }
 }
-
-// Export singleton instance
-export const advocateService = new AdvocateService();

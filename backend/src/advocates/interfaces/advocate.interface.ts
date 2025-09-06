@@ -1,4 +1,3 @@
-// Domain Types
 export interface Advocate {
   id: number;
   firstName: string;
@@ -11,29 +10,21 @@ export interface Advocate {
   createdAt?: Date;
 }
 
-// Database Types
 export interface AdvocateDB {
   id: number;
   first_name: string;
   last_name: string;
   city: string;
   degree: string;
-  payload: string[] | any; // jsonb from postgres
+  payload: string[];
   years_of_experience: number;
   phone_number: number;
   created_at?: Date;
-  search_vector?: string;
-  rank?: number;
 }
 
-// DTOs (Data Transfer Objects)
-export interface SearchAdvocatesRequest {
-  search?: string;
-  specialties?: string[];
-  page?: number;
-  limit?: number;
-  sortBy?: 'relevance' | 'name' | 'experience' | 'city';
-  sortOrder?: 'asc' | 'desc';
+export interface AdvocateSearchResult {
+  advocates: AdvocateDB[];
+  totalCount: number;
 }
 
 export interface PaginationInfo {
@@ -46,10 +37,4 @@ export interface PaginationInfo {
 export interface SearchAdvocatesResponse {
   data: Advocate[];
   pagination: PaginationInfo;
-}
-
-// Repository Response
-export interface AdvocateSearchResult {
-  advocates: AdvocateDB[];
-  totalCount: number;
 }

@@ -42,7 +42,8 @@ export function useAdvocates(initialLimit: number = 50): UseAdvocatesResult {
       params.append('page', page.toString());
       params.append('limit', limit.toString());
       
-      const response = await fetch(`/api/advocates?${params}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/api/advocates?${params}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch advocates: ${response.statusText}`);
