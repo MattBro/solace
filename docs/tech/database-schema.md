@@ -517,6 +517,65 @@ UPDATE advocates
 SET phone_encrypted = pgp_sym_encrypt(phone_number::text, 'encryption_key');
 ```
 
+## Raw SQL vs Drizzle Usage
+
+### Design Decision: Mixed Approach
+
+The advocate repository (`src/app/api/advocates/repositories/advocate.repository.ts`) uses raw SQL instead of Drizzle's query builder for several operations. This is an intentional design decision based on the following factors:
+
+#### When Raw SQL is Used
+
+1. **Full-Text Search Operations**
+   - PostgreSQL `search_vector @@ to_tsquery()` queries
+   - `ts_rank()` functions for search result ranking
+   - Complex search query building with prefix matching
+
+2. **JSONB Operations** 
+   - `payload::jsonb ?|` for "any of" specialty matching
+   - `payload::jsonb @>` for exact specialty matching
+   - Complex array operations that aren't well-supported by query builders
+
+#### Why Raw SQL is Preferred for Search
+
+**Advantages:**
+- Full control over PostgreSQL-specific features
+- Optimal performance for complex search queries
+- Direct access to full-text search ranking
+- No risk of ORM generating inefficient queries
+
+**Trade-offs Accepted:**
+- Reduced type safety (mitigated by TypeScript interfaces)
+- Manual SQL maintenance (acceptable for core search functionality)
+- Less consistency with simple CRUD operations
+
+#### Example: Full-Text Search Query
+
+```sql
+SELECT id, first_name, last_name, city, degree, payload as specialties, 
+       years_of_experience, phone_number, created_at, 
+       ts_rank(search_vector, to_tsquery('english', ${searchQuery})) as rank
+FROM advocates
+WHERE search_vector @@ to_tsquery('english', ${searchQuery})
+ORDER BY rank DESC
+LIMIT ${limit} OFFSET ${offset}
+```
+
+This query combines:
+- Full-text search matching
+- Relevance ranking with `ts_rank()`
+- Proper result ordering
+- Efficient pagination
+
+Attempting to replicate this with Drizzle would require complex workarounds and potentially sacrifice performance.
+
+#### Future Considerations
+
+- Simple CRUD operations could migrate to Drizzle for type safety
+- Search operations will remain raw SQL for performance
+- Consider custom Drizzle extensions for reusable PostgreSQL functions
+
+This mixed approach balances the benefits of type-safe ORM usage with the performance requirements of advanced PostgreSQL features.
+
 ## Conclusion
 
-The database schema is designed to be simple, efficient, and scalable. The use of PostgreSQL with JSONB provides flexibility for evolving requirements while maintaining strong data integrity and performance characteristics.
+The database schema is designed to be simple, efficient, and scalable. The use of PostgreSQL with JSONB provides flexibility for evolving requirements while maintaining strong data integrity and performance characteristics. The strategic use of raw SQL for search operations ensures optimal performance while preserving type safety where it matters most.
