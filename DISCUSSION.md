@@ -35,36 +35,50 @@
 ## Assignment Tasks Progress
 
 ### Task 1: Fix Bugs and Anti-patterns
+**Completed:**
+- ✅ Fixed infinite re-render loop in useEffect
+- ✅ Removed unnecessary console.log statements
+- ✅ Fixed data structure mismatches between API and frontend
+
 **Next to fix:**
 - Implement proper error boundaries for graceful error handling
 - Add comprehensive error handling for API calls
-- Implement proper logging service instead of console statements
+- Implement proper logging service
 - Add input validation and sanitization
-- Fix any memory leaks in useEffect hooks
 
 ### Task 2: Improve Design UI/UX
+**Completed:**
+- ✅ **Search Fix**: Implemented PostgreSQL full-text search - [Implementation details](./todos/UI-UX/search-implementation.md)
+  - Case-insensitive search working
+  - Relevance ranking (names ranked higher)
+  - Handles partial matches and word stems
+- ✅ **Loading States**: Added loading indicators during search
+- ✅ **Search Experience**: Added "no results" message
+
 **Planned improvements:**
 - **Mobile Responsiveness**: Current table doesn't work well on mobile devices
 - **Advanced Search**: Add filters for specialties, location, years of experience
 - **Visual Hierarchy**: Improve spacing, typography, and color scheme for better readability
-- **Loading States**: Add skeleton screens and loading indicators
 - **Interactive Elements**: Add sorting on columns, clickable advocate profiles
 - **Accessibility**: Ensure WCAG 2.1 AA compliance, add ARIA labels
 - **Patient-Focused Features**: Add "book appointment" buttons, availability indicators
-- **Search Experience**: Implement autocomplete, search suggestions, and "no results" states
 
 ### Task 3: Performance Improvements
-**Planned optimizations (critical for "hundreds of thousands" of advocates):**
-- **Backend Pagination**: Implement server-side pagination with cursor-based navigation
-- **Database Optimization**: 
-  - Add indexes on firstName, lastName, city, specialties
-  - Implement full-text search for specialties
-  - Add database query caching
-- **Frontend Optimization**:
-  - Implement virtual scrolling for large lists
-  - Add debounced search (reduce API calls)
-  - Implement React.memo for advocate rows
-  - Use React Query or SWR for data fetching and caching
+**Completed:**
+- ✅ **Backend Pagination**: Implemented server-side pagination (50 records per page)
+- ✅ **Database Optimization**: 
+  - Added full-text search with tsvector and GIN index
+  - Query performance optimized for millions of records
+- ✅ **Frontend Optimization**:
+  - Implemented debounced search (300ms delay)
+  - Only fetches data when needed
+
+**Planned optimizations:**
+- Implement virtual scrolling for large lists
+- Add cursor-based pagination for better performance
+- Implement React.memo for advocate rows
+- Use React Query or SWR for data fetching and caching
+- Add response compression and caching headers
 - **API Improvements**:
   - Add response compression
   - Implement ETags for caching
