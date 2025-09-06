@@ -57,15 +57,34 @@
 ## Testing Commands
 
 ```bash
-# Seed database with custom record count
-npm run seed:performance 100000
+# 1. Setup fresh database with performance data
+npm run db:setup                    # Basic setup with sample data
+npm run seed:performance 100000     # Seed 100k advocates for performance testing
 
-# Run performance tests
-npm run test:performance
+# 2. Start backend server
+npm run dev:backend                 # Start Nest.js backend on port 4000
 
-# Test specific scenarios
-curl "http://localhost:3000/api/advocates?search=therapy&limit=50"
-curl "http://localhost:3000/api/advocates?page=1000&limit=50"
+# 3. Test API performance
+curl "http://localhost:4000/api/advocates?search=therapy&limit=50"
+curl "http://localhost:4000/api/advocates?page=1000&limit=50"
+curl "http://localhost:4000/api/advocates?specialties=ADHD&limit=100"
+
+# 4. View API Documentation
+# Visit: http://localhost:4000/api/docs
+```
+
+## Easy Performance Testing Setup
+
+```bash
+# Complete setup in 3 commands:
+createdb solaceassignment_backend   # Create fresh database
+npm run db:setup                    # Setup schema and basic data  
+npm run seed:performance 50000      # Add 50k records for testing
+npm run dev:backend                 # Start server
+
+# Test performance
+time curl -s "http://localhost:4000/api/advocates?limit=100" > /dev/null
+time curl -s "http://localhost:4000/api/advocates?search=anxiety" > /dev/null
 ```
 
 ## Conclusion
