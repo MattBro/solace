@@ -12,6 +12,7 @@
     "seed": "tsx ./src/db/seed/advocates.ts"
   },
   "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
     "drizzle-orm": "^0.44.5",
     "next": "^15.1.0",
     "postgres": "^3.4.4",
