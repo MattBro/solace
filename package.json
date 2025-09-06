@@ -4,20 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build", 
     "start": "next start",
     "lint": "next lint",
-    "generate": "drizzle-kit generate",
-    "migrate:up": "node ./src/app/api/db/migrations/migrate.js",
-    "seed": "tsx ./src/app/api/db/seed/advocates.ts",
-    "seed:performance": "tsx ./src/app/api/db/seed/performance-seed.ts",
-    "test:performance": "tsx ./scripts/test-performance.ts",
     "dev:frontend": "next dev",
     "dev:backend": "cd backend && npm run start:dev",
     "build:frontend": "next build",
     "build:backend": "cd backend && npm run build",
     "start:frontend": "next start",
-    "start:backend": "cd backend && npm run start:prod"
+    "start:backend": "cd backend && npm run start:prod",
+    "db:setup": "cd backend && npm run db:setup",
+    "seed": "cd backend && npm run seed",
+    "seed:performance": "cd backend && npm run seed:performance"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
