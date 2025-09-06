@@ -8,10 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "generate": "drizzle-kit generate",
-    "migrate:up": "node ./src/db/migrate.js",
-    "seed": "tsx ./src/db/seed/advocates.ts"
+    "migrate:up": "node ./src/app/api/db/migrations/migrate.js",
+    "seed": "tsx ./src/app/api/db/seed/advocates.ts",
+    "seed:performance": "tsx ./src/app/api/db/seed/performance-seed.ts",
+    "test:performance": "tsx ./scripts/test-performance.ts"
   },
   "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
     "drizzle-orm": "^0.44.5",
     "next": "^15.1.0",
     "postgres": "^3.4.4",
@@ -19,9 +22,11 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.0.0",
     "@types/node": "^20.14.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "dotenv": "^17.2.2",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.1.0",
